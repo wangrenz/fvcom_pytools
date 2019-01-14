@@ -6,9 +6,8 @@ from scipy import interpolate
 from scipy.io import netcdf
 import pygrib
 
-
 def read_grib(fnl_path, ndays, u10, v10):
-	lon_lat = np.genfromtxt('/public/home/njxdqx/model/fvcom-exec/input/nele_lon_lat.txt',dtype='f')
+	lon_lat = np.genfromtxt('/fvcom-exec/input/nele_lon_lat.txt',dtype='f')
 
 	file_list = [ fnl_path + "gfs.pgrb2.0p25.f"+ "{0:03d}".format(i) +".grib2" for i in range(0, ndays*24+6, 6 ) ]
 	for i in range(len(file_list)):
@@ -32,7 +31,7 @@ def read_grib(fnl_path, ndays, u10, v10):
 # -- MAIN
 if __name__ == '__main__':
 	global nele_path,nnele,nnode
-	nele_path = "/public/home/njxdqx/model/fvcom-exec/input/nele_lon_lat.txt"
+	nele_path = "/fvcom-exec/input/nele_lon_lat.txt"
 	nnode = 2361
 	nnele = 4448
 	if len(sys.argv) < 4:
@@ -51,18 +50,10 @@ if __name__ == '__main__':
 	time_org  = np.array(times, dtype='f4')
 	Itime_org = np.array(times, dtype='i4')
 	Itime2_org= np.round(( (time_org%1)*24*3600*1000)/(3600*1000))*(3600*1000)
-	print(time_org)
-	print(Itime_org)
-	print(Itime2_org)
 	
 	u10_r = np.zeros(time_org.shape[0],dtype='f')
 	v10_r = np.zeros(time_org.shape[0],dtype='f')
 	u10_r, v10_r = read_grib(fnl_path, ndays, u10_r, v10_r)
-	# f_r = netcdf.netcdf_file('../input/uv_ncl.nc','r')
-	# u10_r = f_r.variables['U10']
-	# v10_r = f_r.variables['V10']
-	# f_r.close()
-	
 	
 	f = netcdf.netcdf_file('uv_force.nc', 'w')
 	f.source = "fvcom grid (unstructured) surface forcing"
